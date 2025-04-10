@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import Tasks from './components/tasks';
 import './App.css';
+import AddTask from './components/add-task';
 
 function App() {
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState({ name: '', date: '', status: '' });
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -13,10 +14,6 @@ function App() {
       .catch((err) => setError('Failed to fetch tasks'));
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewTask({ ...newTask, [name]: value });
-  };
 
   const addTask = () => {
     fetch('http://127.0.0.1:8000/tasks', {
@@ -46,40 +43,13 @@ function App() {
     <div className="App">
       <h1>Task Manager</h1>
       {error && <p className="error">{error}</p>}
-      <div className="task-form">
-        <input
-          type="text"
-          name="name"
-          placeholder="Task Name"
-          value={newTask.name}
-          onChange={handleInputChange}
-        />
-        <input
-          type="text"
-          name="date"
-          placeholder="Task Date"
-          value={newTask.date}
-          onChange={handleInputChange}
-        />
-        <input
-          type="text"
-          name="status"
-          placeholder="Task Status"
-          value={newTask.status}
-          onChange={handleInputChange}
-        />
-        <button onClick={addTask}>Add Task</button>
-      </div>
-      <div className="task-list">
-        {tasks.map((task) => (
-          <div key={task.id} className="task-item">
-            <p>
-              <strong>{task.name}</strong> - {task.date} - {task.status}
-            </p>
-            <button onClick={() => deleteTask(task.id)}>Delete</button>
-          </div>
-        ))}
-      </div>
+      <AddTask addTask={addTask} />
+      <h2>Tasks</h2>
+      {tasks.length ? (
+        <Tasks tasks={tasks} deleteTask={deleteTask} />
+      ) : (
+        <p>No tasks available</p>
+      )}
     </div>
   );
 }
